@@ -106,15 +106,19 @@ const LockPick = ({
 
     return (
 
-        <div style={{
-            position: 'absolute',
-            width: `${width}px`,
-            height: `${height}px`,
-            top: `${top}%`,
-            left: `${left}%`,
-            transform: 'translate(-50%, -50%)',
-            visibility: isVisible ? 'visible' : 'hidden',
-        }}>
+        <div
+            onClick={() => {
+                handleKeyPress({ key: 'f' })
+            }}
+            style={{
+                position: 'absolute',
+                width: `${width}px`,
+                height: `${height}px`,
+                top: `${top}%`,
+                left: `${left}%`,
+                transform: 'translate(-50%, -50%)',
+                visibility: isVisible ? 'visible' : 'hidden',
+            }}>
             <Image
                 key={Math.random()}
                 src={"/circle.png"}

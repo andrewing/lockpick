@@ -17,11 +17,8 @@ const LP = () => {
 
   let i = 0
   const handleKeyPress = (event, lockPickResult) => {
-    console.log(event.key)
     if (event.key === 'f') {
-
       document.removeEventListener('keypress', handleKeyPress);
-
       if (lockPickResult === "YELLOW") {
         i = percent
       } else if (lockPickResult === "RED") {
@@ -88,6 +85,9 @@ const LP = () => {
         alt="Heavy Ornate Chest"
         width={500}
         height={500}
+        onClick={() => {
+          handleKeyPress({ key: 'f' })
+        }}
       />
       <LockPick
         isVisible={isLockPickVisible}
