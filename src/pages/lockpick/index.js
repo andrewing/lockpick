@@ -12,6 +12,8 @@ const LP = () => {
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false)
   const [percent, setPercent] = useState(0)
   const [isPromptVisible, setIsPromptVisible] = useState(true)
+  const [isCancelled, setIsCancelled] = useState(false)
+
 
   let i = 0
   const handleKeyPress = (event, lockPickResult) => {
@@ -19,19 +21,6 @@ const LP = () => {
     if (event.key === 'f') {
 
       document.removeEventListener('keypress', handleKeyPress);
-
-      const handleCancel = (event) => {
-        if (event.key === 'f') {
-          document.removeEventListener('keypress', handleCancel);
-          document.addEventListener('keypress', handleKeyPress);
-          setIsProgressBarVisible(false)
-          i = 0
-          setPercent(0)
-          clearInterval(interval)
-        }
-      };
-
-      document.addEventListener('keypress', handleCancel);
 
       if (lockPickResult === "YELLOW") {
         i = percent
@@ -48,8 +37,6 @@ const LP = () => {
         randomNum = -999
       }
 
-      console.log(i, randomNum, "HERE")
-
       const interval = setInterval(() => {
         if (i === randomNum && lockPickResult !== "YELLOW") {
           setIsLockPickVisible(true)
@@ -64,12 +51,8 @@ const LP = () => {
           clearInterval(interval)
           setIsProgressBarVisible(false)
           document.addEventListener('keypress', handleKeyPress);
-          document.removeEventListener('keypress', handleCancel);
         }
       }, 25)
-      
-      document.removeEventListener('keypress', handleCancel);
-
     }
   };
 
@@ -78,7 +61,6 @@ const LP = () => {
     return () => {
       document.removeEventListener('keypress', handleKeyPress);
     }
-
   }, [])
 
   useEffect(() => {
@@ -88,7 +70,6 @@ const LP = () => {
       setIsPromptVisible(true)
     }
   }, [isLockPickVisible, isProgressBarVisible])
-
 
   return (
     <div
@@ -152,13 +133,6 @@ const LP = () => {
 
           }}
         />
-        <Text
-          style={{
-            fontSize: '12px',
-          }}
-        >
-          {")F( Cancel"}
-        </Text>
       </div>
     </div>
   )
