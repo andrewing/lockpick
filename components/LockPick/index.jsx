@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 
 const LockPick = ({
     setIsVisible,
+    handleKeyPress,
+    setPercent,
     isVisible = true,
     top = 70,
     left = 50,
@@ -18,57 +20,92 @@ const LockPick = ({
 
 
     useEffect(() => {
-        const handleKeyPress = (event) => {
-            if (event.key === 'e' && !isAnimationStarted) {
-                // random number between 180 and 360
-                const randomDegreeYellow = Math.floor(Math.random() * (360 - 180 + 1) + 180);
-                setDegYellow(randomDegreeYellow);
-                let startYellow = randomDegreeYellow - 33.3;
-                let endYellow = randomDegreeYellow + 33.3;
-                let lowerLimitRed = startYellow + 6;
-                let higherLimitRed = endYellow - 6;
-                const randomDegreeRed = Math.floor(Math.random() * (higherLimitRed - lowerLimitRed + 1) + lowerLimitRed);
-                setDegRed(randomDegreeRed);
+        const lockPickFailAudio = new Audio("lockpick_fail.wav")
+        const lockPickSuccessAudio = new Audio("lockpick_success.wav")
+        const lockPickStartAudio = new Audio("lockpick_start.wav")
+        const lockPickInProgressAudio = new Audio("lockpick_inprogress.wav")
 
+        lockPickFailAudio.preload = 'auto'
+        lockPickSuccessAudio.preload = 'auto'
+        lockPickStartAudio.preload = 'auto'
+        lockPickInProgressAudio.preload = 'auto'
 
-                setIsAnimationStarted(true);
-            }
+        if (isVisible && !isAnimationStarted) {
+            // random number between 180 and 360
+            const LOWER_LIMIT = 120
+            const HIGHER_LIMIT = 240
 
+            const randomDegreeYellow = Math.floor(Math.random() * (HIGHER_LIMIT - LOWER_LIMIT + 1) + LOWER_LIMIT);
+            setDegYellow(randomDegreeYellow);
+            let startYellow = randomDegreeYellow - 33.3;
+            let endYellow = randomDegreeYellow + 33.3;
+            let lowerLimitRed = startYellow + 6;
+            let higherLimitRed = endYellow - 6;
+            const randomDegreeRed = Math.floor(Math.random() * (higherLimitRed - lowerLimitRed + 1) + lowerLimitRed);
+            setDegRed(randomDegreeRed);
+            setIsAnimationStarted(true);
+            lockPickStartAudio.play()
+        }
+        const handlePress = (event) => {
             if (event.key === ' ' && isAnimationStarted) {
-                setIsAnimationStarted(false);
+
+                let startYellow = degYellow - 33.3;
+                let endYellow = degYellow + 33.3;
+                let startRed = degRed - 7.5;
+                let endRed = degRed + 7.5;
+
+                if (-1 * animationDegree >= startRed && -1 * animationDegree <= endRed) {
+                    lockPickSuccessAudio.play()
+                    handleKeyPress({ key: 'e' }, "RED")
+                } else if (-1 * animationDegree >= startYellow && -1 * animationDegree <= endYellow) {
+                    lockPickSuccessAudio.play()
+                    handleKeyPress({ key: 'e' }, "YELLOW")
+                } else {
+                    lockPickFailAudio.play()
+                    handleKeyPress({ key: 'e' }, "FAIL")
+                }
                 setAnimationDegree(0);
+                setIsAnimationStarted(false);
                 setIsVisible(false);
             }
-        };
 
-        document.addEventListener('keypress', handleKeyPress);
+        }
+
+        window.addEventListener('keypress', handlePress);
         return () => {
-            document.removeEventListener('keypress', handleKeyPress);
-        };
-    }, [isAnimationStarted]);
+            window.removeEventListener('keypress', handlePress);
+        }
+
+    }, [isVisible, isAnimationStarted, animationDegree, degYellow, degRed]);
+
 
     useEffect(() => {
-        if (isAnimationStarted) {
-            const interval = setInterval(() => {
-                setAnimationDegree((prevDegree) => {
-                    if (prevDegree <= -360) {
-                        setIsVisible(false)
-                        setIsAnimationStarted(false);
-                        setAnimationDegree(0);
-                        clearInterval(interval);
-                    }
-                    return prevDegree % 360 - 4
-                });
-            }, 10);
+        const lockPickFailAudio = new Audio("lockpick_fail.wav")
 
+        if (isAnimationStarted) {
+            let i = 0
+            const interval = setInterval(() => {
+                if (i <= -360) {
+                    lockPickFailAudio.play()
+
+                    clearInterval(interval);
+                    setIsVisible(false)
+                    setIsAnimationStarted(false);
+                    setAnimationDegree(0);
+                    handleKeyPress({ key: 'e' }, "FAIL")
+                } else {
+                    i = i % 360 - 4
+                    setAnimationDegree(i);
+                }
+            }, 10);
             return () => clearInterval(interval);
         }
     }, [isAnimationStarted]);
 
 
-    if (!isVisible) {
-        return null;
-    }
+    // if (!isVisible) {
+    //     return null;
+    // }
 
     return (
 
@@ -79,7 +116,7 @@ const LockPick = ({
             top: `${top}%`,
             left: `${left}%`,
             transform: 'translate(-50%, -50%)',
-
+            visibility: isVisible ? 'visible' : 'hidden',
         }}>
             <Image
                 key={Math.random()}

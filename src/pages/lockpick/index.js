@@ -1,22 +1,74 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import LockPick from "../../../components/LockPick"
-import ProgressPie from "../../../components/ProgressPie";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import 'react-circular-progressbar/dist/styles.css';
+import { Text } from "@nextui-org/react";
+
 
 const { default: Image } = require("next/image")
 
 const LP = () => {
-  const [isVisible, setIsVisible] = useState(true)
+  const [isLockPickVisible, setIsLockPickVisible] = useState(false)
+  const [isProgressBarVisible, setIsProgressBarVisible] = useState(false)
+  const [percent, setPercent] = useState(0)
 
-  useEffect(() => {
-  const handleKeyPress = (event) => {
+
+  let i = 0
+  const handleKeyPress = (event, lockPickResult) => {
     if (event.key === 'e') {
-      setIsVisible(true);
+      document.removeEventListener('keypress', handleKeyPress);
+      if (lockPickResult === "YELLOW") {
+        i = percent
+      } else if (lockPickResult === "RED") {
+        i = 100
+      } else if (lockPickResult === "FAIL") {
+        i = 100
+      }
+      setIsProgressBarVisible(true)
+
+      let randomNum = Math.floor(Math.random() * (80 - 50 + 1) + 50)
+
+      if (i > 50) {
+        randomNum = -999
+      }
+
+      const interval = setInterval(() => {
+        if (i === randomNum) {
+          setIsLockPickVisible(true)
+          clearInterval(interval)
+        } else {
+          i++
+          setPercent(i)
+        }
+        if (i >= 100) {
+          i = 0
+          setPercent(0)
+          clearInterval(interval)
+          setIsProgressBarVisible(false)
+          document.addEventListener('keypress', handleKeyPress);
+        }
+      }, 25)
+
+      const handleCancel = (event) => {
+        if (event.key === 'f') {
+          document.removeEventListener('keypress', handleCancel);
+          document.addEventListener('keypress', handleKeyPress);
+          setIsProgressBarVisible(false)
+          setPercent(0)
+          clearInterval(interval)
+        }
+      };
+
+      document.addEventListener('keypress', handleCancel);
     }
   };
 
-  document.addEventListener('keypress', handleKeyPress);
+  useEffect(() => {
+    document.addEventListener('keypress', handleKeyPress);
   }, [])
-  return(
+
+
+  return (
     <div
       style={{
         height: '100vh',
@@ -24,18 +76,65 @@ const LP = () => {
         justifyContent: 'center',
       }}
     >
-      <Image 
+      <Image
         key={Math.random()}
         src="/Heavy_Ornate_Chest.png"
         alt="Heavy Ornate Chest"
         width={500}
         height={500}
       />
-      <LockPick 
-        isVisible={isVisible}
-        setIsVisible={setIsVisible}
+      <LockPick
+        isVisible={isLockPickVisible}
+        setIsVisible={setIsLockPickVisible}
+        handleKeyPress={handleKeyPress}
       />
-      <ProgressPie progress={50} />  
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '50px',
+          height: '50px',
+          visibility: isProgressBarVisible ? 'visible' : 'hidden',
+        }}
+      >
+        <CircularProgressbar
+          value={percent}
+          text={`${percent}%`}
+          counterClockwise={true}
+          strokeWidth={10}
+          background={true}
+          styles={{
+
+            root: {},
+            path: {
+              stroke: `rgb(203, 184, 146)`,
+              strokeLinecap: "butt",
+              transition: 'stroke-dasharray 0.1s',
+            },
+            trail: {
+              stroke: "#111111",
+              strokeLinecap: "butt",
+            },
+            text: {
+              fill: "#fff",
+              fontSize: "20 px",
+            },
+            background: {
+              fill: "#222222",
+            },
+
+          }}
+        />
+        <Text
+          style={{
+            fontSize: '12px',
+          }}
+        >
+          {")F( Cancel"}
+        </Text>
+      </div>
     </div>
   )
 }
