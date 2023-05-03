@@ -56,13 +56,13 @@ const LockPick = ({
 
                 if (-1 * animationDegree >= startRed && -1 * animationDegree <= endRed) {
                     lockPickSuccessAudio.play()
-                    handleKeyPress({ key: 'e' }, "RED")
+                    handleKeyPress({ key: 'f' }, "RED")
                 } else if (-1 * animationDegree >= startYellow && -1 * animationDegree <= endYellow) {
                     lockPickSuccessAudio.play()
-                    handleKeyPress({ key: 'e' }, "YELLOW")
+                    handleKeyPress({ key: 'f' }, "YELLOW")
                 } else {
                     lockPickFailAudio.play()
-                    handleKeyPress({ key: 'e' }, "FAIL")
+                    handleKeyPress({ key: 'f' }, "FAIL")
                 }
                 setAnimationDegree(0);
                 setIsAnimationStarted(false);
@@ -92,7 +92,7 @@ const LockPick = ({
                     setIsVisible(false)
                     setIsAnimationStarted(false);
                     setAnimationDegree(0);
-                    handleKeyPress({ key: 'e' }, "FAIL")
+                    handleKeyPress({ key: 'f' }, "FAIL")
                 } else {
                     i = i % 360 - 4
                     setAnimationDegree(i);

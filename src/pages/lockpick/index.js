@@ -3,7 +3,7 @@ import LockPick from "../../../components/LockPick"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
 import { Text } from "@nextui-org/react";
-
+import Prompt from "../../../components/Prompt";
 
 const { default: Image } = require("next/image")
 
@@ -11,11 +11,12 @@ const LP = () => {
   const [isLockPickVisible, setIsLockPickVisible] = useState(false)
   const [isProgressBarVisible, setIsProgressBarVisible] = useState(false)
   const [percent, setPercent] = useState(0)
-
+  const [isPromptVisible, setIsPromptVisible] = useState(true)
 
   let i = 0
   const handleKeyPress = (event, lockPickResult) => {
-    if (event.key === 'e') {
+    console.log(event.key)
+    if (event.key === 'f') {
       document.removeEventListener('keypress', handleKeyPress);
       if (lockPickResult === "YELLOW") {
         i = percent
@@ -54,6 +55,7 @@ const LP = () => {
           document.removeEventListener('keypress', handleCancel);
           document.addEventListener('keypress', handleKeyPress);
           setIsProgressBarVisible(false)
+          i = 0
           setPercent(0)
           clearInterval(interval)
         }
@@ -67,6 +69,14 @@ const LP = () => {
     document.addEventListener('keypress', handleKeyPress);
   }, [])
 
+  useEffect(() => {
+    if (isLockPickVisible || isProgressBarVisible) {
+      setIsPromptVisible(false)
+    } else {
+      setIsPromptVisible(true)
+    }
+  }, [isLockPickVisible, isProgressBarVisible])
+
 
   return (
     <div
@@ -76,6 +86,9 @@ const LP = () => {
         justifyContent: 'center',
       }}
     >
+      <Prompt
+        isVisible={isPromptVisible}
+      />
       <Image
         key={Math.random()}
         src="/Heavy_Ornate_Chest.png"
