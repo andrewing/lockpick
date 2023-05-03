@@ -17,7 +17,22 @@ const LP = () => {
   const handleKeyPress = (event, lockPickResult) => {
     console.log(event.key)
     if (event.key === 'f') {
+
       document.removeEventListener('keypress', handleKeyPress);
+
+      const handleCancel = (event) => {
+        if (event.key === 'f') {
+          document.removeEventListener('keypress', handleCancel);
+          document.addEventListener('keypress', handleKeyPress);
+          setIsProgressBarVisible(false)
+          i = 0
+          setPercent(0)
+          clearInterval(interval)
+        }
+      };
+
+      document.addEventListener('keypress', handleCancel);
+
       if (lockPickResult === "YELLOW") {
         i = percent
       } else if (lockPickResult === "RED") {
@@ -33,8 +48,10 @@ const LP = () => {
         randomNum = -999
       }
 
+      console.log(i, randomNum, "HERE")
+
       const interval = setInterval(() => {
-        if (i === randomNum) {
+        if (i === randomNum && lockPickResult !== "YELLOW") {
           setIsLockPickVisible(true)
           clearInterval(interval)
         } else {
@@ -47,26 +64,21 @@ const LP = () => {
           clearInterval(interval)
           setIsProgressBarVisible(false)
           document.addEventListener('keypress', handleKeyPress);
+          document.removeEventListener('keypress', handleCancel);
         }
       }, 25)
+      
+      document.removeEventListener('keypress', handleCancel);
 
-      const handleCancel = (event) => {
-        if (event.key === 'f') {
-          document.removeEventListener('keypress', handleCancel);
-          document.addEventListener('keypress', handleKeyPress);
-          setIsProgressBarVisible(false)
-          i = 0
-          setPercent(0)
-          clearInterval(interval)
-        }
-      };
-
-      document.addEventListener('keypress', handleCancel);
     }
   };
 
   useEffect(() => {
     document.addEventListener('keypress', handleKeyPress);
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress);
+    }
+
   }, [])
 
   useEffect(() => {

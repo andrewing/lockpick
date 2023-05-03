@@ -48,7 +48,6 @@ const LockPick = ({
         }
         const handlePress = (event) => {
             if (event.key === ' ' && isAnimationStarted) {
-
                 let startYellow = degYellow - 33.3;
                 let endYellow = degYellow + 33.3;
                 let startRed = degRed - 7.5;
@@ -68,9 +67,7 @@ const LockPick = ({
                 setIsAnimationStarted(false);
                 setIsVisible(false);
             }
-
         }
-
         window.addEventListener('keypress', handlePress);
         return () => {
             window.removeEventListener('keypress', handlePress);
@@ -103,9 +100,9 @@ const LockPick = ({
     }, [isAnimationStarted]);
 
 
-    // if (!isVisible) {
-    //     return null;
-    // }
+    if (!isVisible) {
+        return null;
+    }
 
     return (
 
